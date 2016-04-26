@@ -12,7 +12,7 @@ namespace HeyListen
 {
     class SpeechListener
     {
-        private static readonly float CONFIDENCE = 0.8F;
+        private readonly float _confidence;
         IDictionary<string, Action> wordsToActions = new Dictionary<string, Action>();
         private readonly string _toggleOnWord;
         private readonly string _toggleOffWord;
@@ -21,8 +21,9 @@ namespace HeyListen
 
         private readonly bool _toggleActive;
 
-        public SpeechListener(string toggleOnWord, string toggleOffWord)
+        public SpeechListener(string toggleOnWord, string toggleOffWord, float confidence)
         {
+            _confidence = confidence;
             if (string.IsNullOrWhiteSpace(toggleOnWord) || string.IsNullOrWhiteSpace(toggleOffWord))
             {
                 _toggleActive = false;
@@ -34,13 +35,10 @@ namespace HeyListen
             _toggleActive = true;
         }
 
-        public void StartAsyncListening(params IVoiceCommand[] commands)
+        public void StartAsyncListening()
         {
-
-            using (SpeechRecognitionEngine recognizer
-                = new SpeechRecognitionEngine(new CultureInfo("en-US")))
+            using (SpeechRecognitionEngine recognizer = new SpeechRecognitionEngine(new CultureInfo("en-US")))
             {
-                AddCommands(commands);
                 Choices wordChoices = new Choices();
 
                 IEnumerable<string> words = wordsToActions.Keys;
@@ -87,7 +85,7 @@ namespace HeyListen
         // Create a simple handler for the SpeechRecognized event.
         void recognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
-            if (e.Result.Confidence < CONFIDENCE)
+            if (e.Result.Confidence < _confidence)
             {
                 return;
             }
@@ -99,7 +97,7 @@ namespace HeyListen
             {
                 Awake = true;
             }
-            if(_toggleActive && !Awake)
+            if (_toggleActive && !Awake)
             {
                 return;
             }
