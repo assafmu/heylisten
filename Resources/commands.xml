@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<commands>
+  <command word="internet" program="C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" />
+  <command word="four seasons" program="C:\Users\Assaf\Music\Playlists\Four Seasons.wpl" />
+  <command word="Nothing" program="" />
+  <site word="news" url="ynet.co.il" />
+  <site word="mail" url="gmail.com" />
+  <command word="Favorites" >
+    <!--<program value="C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"/>-->
+    <site value="smbc-comics.com"/>
+    <site value="xkcd.com"/>
+    <site value="http://explosm.net/"/>
+    <site value="quora.com"/>
+  </command>
+</commands>
