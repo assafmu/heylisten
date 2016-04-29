@@ -1,6 +1,7 @@
 ﻿using HeyListen.VoiceCommands;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,10 +12,13 @@ namespace HeyListen.Providers
     {
         private readonly string _browserPath;
         private string _filename;
+        private readonly bool _verbose;
+
         public CmdVoiceCommandsProvider(string filename)
         {
-            this._filename = filename;
-            this._browserPath = System.Configuration.ConfigurationManager.AppSettings["BrowserPath"];
+            _filename = filename;
+            _browserPath = ConfigurationManager.AppSettings["BrowserPath"];
+            _verbose = bool.Parse(ConfigurationManager.AppSettings["CMDArgsMessageBoxEnabled"]);
         }
 
         public IEnumerable<IVoiceCommand> GetVoiceCommands()
@@ -31,24 +35,24 @@ namespace HeyListen.Providers
         {
             if (element.Name.LocalName.ToLower().Equals("command") && element.Attribute("program") != null)
             {
-                return new CMDVoiceCommand(element.Attribute("word").Value, element.Attribute("program").Value);
+                return new CMDVoiceCommand(_verbose,element.Attribute("word").Value, element.Attribute("program").Value);
             }
             if (element.Name.LocalName.ToLower().Equals("site") && element.Attribute("url") != null)
             {
-                return new CMDVoiceCommand(element.Attribute("word").Value, _browserPath, element.Attribute("url").Value);
+                return new CMDVoiceCommand(_verbose,element.Attribute("word").Value, _browserPath, element.Attribute("url").Value);
             }
 
             var programActionStrings = element.Elements("program").Select(x => x.Attribute("value").Value);
             var programActions = programActionStrings.Select<string, Action>(s =>
                  (
-                     () => { CMDVoiceCommand.CallCMDInBackground(s); }
+                     () => { CMDVoiceCommand.CallCMDInBackground(_verbose,s); }
                  )
             );
 
             var internetActionStrings = element.Elements("site").Select(x => x.Attribute("value").Value);
             var internetActions = internetActionStrings.Select<string, Action>(s =>
                 (
-                    () => { CMDVoiceCommand.CallCMDInBackground(_browserPath, s); }
+                    () => { CMDVoiceCommand.CallCMDInBackground(_verbose,_browserPath, s); }
                 )
             );
             return new CompositeCommand(element.Attribute("word").Value, programActions.Concat(internetActions).ToArray());

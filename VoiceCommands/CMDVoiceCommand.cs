@@ -14,12 +14,14 @@ namespace HeyListen.VoiceCommands
         string _word;
         string _command;
         private readonly string _param;
+        private readonly bool _verbose;
 
-        public CMDVoiceCommand(string word, string command,string param=null)
+        public CMDVoiceCommand(bool verbose,string word, string command,string param=null)
         {
             _command = command;
             _word = word;
             _param = param;
+            _verbose = verbose;
         }
         public string GetWord()
         {
@@ -28,18 +30,18 @@ namespace HeyListen.VoiceCommands
 
         public void PerformAsyncAction()
         {
-            CallCMDInBackground(_command,_param);
+            CallCMDInBackground(_verbose,_command,_param);
             
         }
 
-        public static void CallCMDInBackground(string cmdArgs,string param=null)
+        public static void CallCMDInBackground(bool verbose,string cmdArgs,string param=null)
         {
             string formattedArgs = string.Format(@"/c ""{0}""", cmdArgs);
             if (param != null)
             {
                 formattedArgs += " " + param;
             }
-            if (Boolean.Parse(ConfigurationManager.AppSettings["CMDArgsMessageBoxEnabled"]))
+            if (verbose)
             {
                 MessageBox.Show(formattedArgs);
             }

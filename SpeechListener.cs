@@ -39,31 +39,19 @@ namespace HeyListen
         {
             using (SpeechRecognitionEngine recognizer = new SpeechRecognitionEngine(new CultureInfo("en-US")))
             {
-                Choices wordChoices = new Choices();
-
                 IEnumerable<string> words = wordsToActions.Keys;
                 if (_toggleActive)
                 {
                     words = words.Concat(new[] { _toggleOffWord, _toggleOnWord });
                 }
-                wordChoices.Add(words.ToArray());
 
-                // Create a GrammarBuilder object and append the Choices object.
-                GrammarBuilder gb = new GrammarBuilder();
-                gb.Append(wordChoices);
-
-                // Create the Grammar instance and load it into the speech recognition engine.
+                Choices wordChoices = new Choices(words.ToArray());
+                GrammarBuilder gb = new GrammarBuilder(wordChoices);
                 Grammar g = new Grammar(gb);
                 recognizer.LoadGrammar(g);
-
-                // Add a handler for the speech recognized event.
                 recognizer.SpeechRecognized +=
                   new EventHandler<SpeechRecognizedEventArgs>(recognizer_SpeechRecognized);
-
-                // Configure input to the speech recognizer.
                 recognizer.SetInputToDefaultAudioDevice();
-
-                // Start asynchronous, continuous speech recognition.
                 recognizer.RecognizeAsync(RecognizeMode.Multiple);
 
                 // Keep the process running.
